@@ -1,5 +1,7 @@
 const recipie = require("../models/recipieModel");
 const User = require("../models/userModel")
+const Comment = require("../models/commentModel.js")
+
 
 const getRecipies = async (req, res) => {
   try {
@@ -63,15 +65,19 @@ const searchRecipe = async (req, res) => {
 };
 
 const likeRecipie = async (req, res) => {
+  
   try {
-    const userId = req.query.user; // Assuming the user ID is passed as a query parameter
-    const recipeId = req.params.id;
+    console.log(req.query.user)
+    const userId = req.query.user?.trim(); // Trim removes the newline or spaces
 
+    const recipeId = req.params.id;
+   
     if (!userId) {
       return res.status(400).json({ message: 'User ID is required to like a recipe' });
     }
 
     const recipe = await recipie.findById(recipeId);
+    
 
     if (!recipe) {
       return res.status(404).json({ message: 'Recipe not found' });
@@ -95,6 +101,43 @@ const likeRecipie = async (req, res) => {
     res.status(500).json({ message: 'Failed to like/unlike recipe', error: error.message });
   }
 };
+
+const commentOnRecipe = async (req, res) => {
+  try {
+    const { recipeId } = req.params;
+    const { userId, text } = req.body;
+
+ 
+    if (!text || text.trim().length === 0) {
+      return res.status(400).json({ message: 'Comment text is required' });
+    }
+
+    // Check recipe exists
+    const recipe = await recipie.findById(recipeId);
+    if (!recipe) {
+      return res.status(404).json({ message: 'Recipe not found' });
+    }
+
+    // Create comment
+    const newComment = new Comment({
+      text,
+      author: userId,
+      recipe: recipeId
+    });
+    await newComment.save();
+
+    // Add comment reference to recipe
+    recipe.comments.push(newComment._id);
+    await recipe.save();
+
+    res.status(201).json({ message: 'Comment added', comment: newComment });
+  } catch (error) {
+    console.error('Error adding comment:', error);
+    res.status(500).json({ message: 'Failed to add comment', error: error.message });
+  }
+};
+
+
 
 const updateRecipie = async (req, res) => {
   try {
@@ -139,4 +182,4 @@ const deleteRecepie = async (req, res) => {
 
 
 
-module.exports = { getRecipies, getRecipeById , searchRecipe, postrecipie, likeRecipie, updateRecipie, deleteRecepie};
+module.exports = { getRecipies, getRecipeById , searchRecipe, postrecipie, likeRecipie, commentOnRecipe, updateRecipie, deleteRecepie};

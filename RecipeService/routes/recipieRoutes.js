@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const {getRecipies,getRecipeById,postrecipie,searchRecipe,likeRecipie,updateRecipie,deleteRecepie } = require("../controllers/recipieController");
+const {getRecipies,getRecipeById,postrecipie,searchRecipe,likeRecipie,commentOnRecipe,updateRecipie,deleteRecepie } = require("../controllers/recipieController");
 
 // searchrecipie, postrecipie, likeRecipie, updateRecipie, deleteRecepie
 
@@ -13,6 +13,8 @@ router.get('/get-recipie/:id' , getRecipeById);
 router.get('/search-recepie' , searchRecipe);
 
 router.put('/like-recipie/:id',likeRecipie);
+router.put('/comment-recipie/:id',commentOnRecipe);
+
 router.put('/update-recepie/:id',updateRecipie);
 
 router.delete('/delete-recepie/:id',deleteRecepie);
