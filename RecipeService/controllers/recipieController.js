@@ -104,7 +104,7 @@ const likeRecipie = async (req, res) => {
 
 const commentOnRecipe = async (req, res) => {
   try {
-    const { recipeId } = req.params;
+    const recipeId = req.params.id;
     const { userId, text } = req.body;
 
  
